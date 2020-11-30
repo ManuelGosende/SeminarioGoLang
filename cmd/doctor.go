@@ -1,15 +1,14 @@
 package main
 
 import (
-
+	"SeminarioGoLang/internal/config"
+	"SeminarioGoLang/internal/database"
+	"SeminarioGoLang/internal/service"
 	"flag"
 	"fmt"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"github.com/go-delve/delve/pkg/config"
-	"github.com/jmoiron/sqlx"
-	
 )
 
 func main() {
@@ -38,9 +37,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	service, err := doctor.New(db, cfg)
-	htppService := service.NewHTTPTransport(service)
-	
+	srv, err := service.New(db, cfg)
+	htppService := service.NewHTTPTransport(srv)
+
 	router := gin.Default()
 	htppService.Register(router)
 	router.Run()

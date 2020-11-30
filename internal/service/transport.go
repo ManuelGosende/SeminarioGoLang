@@ -1,15 +1,14 @@
 package service
 
 import (
-
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
-	"github.com/gin-gonic/gin"
 
+	"github.com/gin-gonic/gin"
 )
 
 // HTTPService ...
@@ -45,34 +44,34 @@ func makeEndpoints(d DoctorService) []*endpoint {
 	list := []*endpoint{}
 
 	// C
-	list = append(list, &endpoint {
+	list = append(list, &endpoint{
 		method:   "POST",
 		path:     "/doctor",
 		function: Insert(d),
 	})
 
 	// R
-	list = append(list, &endpoint {
+	list = append(list, &endpoint{
 		method:   "GET",
 		path:     "/doctors",
 		function: FindAll(d),
 	})
 
 	// U
-	list = append(list, &endpoint {
+	list = append(list, &endpoint{
 		method:   "PUT",
 		path:     "/doctor/:id",
 		function: Update(d),
 	})
 
 	// D
-	list = append(list, &endpoint {
+	list = append(list, &endpoint{
 		method:   "DELETE",
 		path:     "/doctor/:id",
 		function: Delete(d),
 	})
 
-	list = append(list, &endpoint {
+	list = append(list, &endpoint{
 		method:   "GET",
 		path:     "/doctor/:id",
 		function: FindByID(d),
@@ -148,7 +147,7 @@ func Update(d DoctorService) gin.HandlerFunc {
 
 		d.Update(Id, doctor)
 
-		c.JSON(http.StatusOK, gin.H {
+		c.JSON(http.StatusOK, gin.H{
 			"Message": "Se modificó el doctor",
 		})
 
@@ -160,8 +159,15 @@ func Delete(d DoctorService) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		d.Delete(strconv.Atoi(c.Param("id")))
-		c.JSON(http.StatusOK, gin.H {
+		id, err := strconv.Atoi(c.Param("id"))
+
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		d.Delete(id)
+		c.JSON(http.StatusOK, gin.H{
 			"Message": "Se eliminó el Doctor",
 		})
 
@@ -180,8 +186,8 @@ func FindByID(d DoctorService) gin.HandlerFunc {
 			os.Exit(1)
 		}
 
-		c.JSON(http.StatusOK, gin.H {
-			"Beer": d.FindByID(id),
+		c.JSON(http.StatusOK, gin.H{
+			"Doctor": d.FindByID(id),
 		})
 
 	}

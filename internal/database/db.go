@@ -1,34 +1,32 @@
 package database
 
 import (
-	
+	"SeminarioGoLang/internal/config"
 	"errors"
-	"example.com/m/v2/internal/config"
-	"github.com/jmoiron/sqlx"
 
+	_ "github.com/mattn/go-sqlite3"
+
+	"github.com/jmoiron/sqlx"
 )
 
-//NewDataBase ...
+// NewDataBase ...
 func NewDataBase(conf *config.Config) (*sqlx.DB, error) {
-
-	switch conf.DbCfg.Type {
-
+	switch conf.DB.Type {
 	case "sqlite3":
-		db, err := sqlx.Open(conf.DbCfg.Driver, ":memory:")
+		db, err := sqlx.Open(conf.DB.Driver, conf.DB.Conn)
 		if err != nil {
 			return nil, err
 		}
+
 		err = db.Ping()
 		if err != nil {
 			return nil, err
 		}
+
 		return db, nil
-	
 	default:
 		return nil, errors.New("invalid db type")
-
 	}
-
 }
 
 //CreateSchema ...

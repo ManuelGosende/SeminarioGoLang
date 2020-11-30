@@ -1,40 +1,32 @@
 package service
 
 import (
-
+	"SeminarioGoLang/internal/config"
 	"fmt"
 
-	"example.com/m/v2/internal/config"
 	"github.com/jmoiron/sqlx"
-	
 )
 
 //Doctor ...
 type Doctor struct {
-
-	Id             	int
-	Name           	string
-	Enrollment 		string
-	Age          	int
-
+	Id         int
+	Name       string
+	Enrollment string
+	Age        int
 }
 
 //DoctorService ...
 type DoctorService interface {
-
 	Insert(Doctor) error
 	FindByID(int) *Doctor
 	Update(int, Doctor) int
-	Delete(int, error) int
+	Delete(int) int
 	FindAll() []*Doctor
-
 }
 
 type service struct {
-
 	db     *sqlx.DB
 	config *config.Config
-
 }
 
 //New ...
@@ -80,19 +72,17 @@ func (s service) Insert(d Doctor) error {
 }
 
 //FindByID ...
-func (s service) FindByID(Id int) (*Doctor, error) {
+func (s service) FindByID(Id int) *Doctor {
 
 	var Doctor Doctor
 
 	query := "SELECT * FROM Doctor WHERE ID=?"
 
-	if err := s.db.Get(&Doctor, query, Id); 
+	if err := s.db.Get(&Doctor, query, Id); err != nil {
+		return nil
+	}
 
-	err != nil {
-		return nil, err
-	}	
-
-	return &Doctor, nil
+	return &Doctor
 
 }
 
@@ -137,5 +127,3 @@ func (s service) Delete(Id int) int {
 	return Id
 
 }
-
-
