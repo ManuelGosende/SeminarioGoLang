@@ -88,22 +88,27 @@ func Insert(d DoctorService) gin.HandlerFunc {
 		data, err := ioutil.ReadAll(c.Request.Body)
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error en el método ReadAll")
 			os.Exit(1)
 		}
 
 		var doctor Doctor
 
 		if err = json.Unmarshal(data, &doctor); err != nil {
-			fmt.Println(err)
+			fmt.Println("Error en el método Unmarshal")
 			os.Exit(1)
 		}
 
-		err = d.Insert(doctor)
+		doc, err := d.Insert(doctor)
 
 		if err != nil {
-			fmt.Println("No se pudo insertar Doctor")
-			fmt.Println(err.Error())
+			c.JSON(http.StatusBadRequest, gin.H{
+				"Message": "Error en método Insert",
+			})
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"person": doc,
+			})
 		}
 
 	}
@@ -113,9 +118,19 @@ func Insert(d DoctorService) gin.HandlerFunc {
 func FindAll(d DoctorService) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"Data": d.FindAll(),
-		})
+
+		doctors, err := d.FindAll()
+
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"Message": "Error en la consulta, intentelo de nuevo",
+			})
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"Data": doctors,
+			})
+		}
+
 	}
 
 }
@@ -127,29 +142,35 @@ func Update(d DoctorService) gin.HandlerFunc {
 		data, err := ioutil.ReadAll(c.Request.Body)
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error en el método ReadAll")
 			os.Exit(1)
 		}
 
 		var doctor Doctor
 
 		if err = json.Unmarshal(data, &doctor); err != nil {
-			fmt.Println(err)
+			fmt.Println("Error en el método Unmarshal")
 			os.Exit(1)
 		}
 
 		Id, err := strconv.Atoi(c.Param("id"))
 
 		if err = json.Unmarshal(data, &doctor); err != nil {
-			fmt.Println(err)
+			fmt.Println("Error en el método Unmarshal")
 			os.Exit(1)
 		}
 
-		d.Update(Id, doctor)
+		doc, err := d.Update(Id, doctor)
 
-		c.JSON(http.StatusOK, gin.H{
-			"Message": "Se modificó el doctor",
-		})
+		if err != nil {
+			fmt.Println("Error en el método Update")
+			os.Exit(1)
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"Message": "Se modificó el doctor",
+				"ID":      doc,
+			})
+		}
 
 	}
 
@@ -162,14 +183,21 @@ func Delete(d DoctorService) gin.HandlerFunc {
 		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error en el método Atoi")
 			os.Exit(1)
 		}
 
-		d.Delete(id)
-		c.JSON(http.StatusOK, gin.H{
-			"Message": "Se eliminó el Doctor",
-		})
+		doc, err := d.Delete(id)
+
+		if err != nil {
+			fmt.Println("Error en el método Delete")
+			os.Exit(1)
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"Message": "Se eliminó el Doctor",
+				"ID":      doc,
+			})
+		}
 
 	}
 
@@ -180,14 +208,15 @@ func FindByID(d DoctorService) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		id, err := strconv.Atoi(c.Param("id"))
+		doc, err := d.FindByID(id)
 
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error en el método FindByID")
 			os.Exit(1)
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"Doctor": d.FindByID(id),
+			"Doctor": doc,
 		})
 
 	}

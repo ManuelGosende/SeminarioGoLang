@@ -3,6 +3,7 @@ package database
 import (
 	"SeminarioGoLang/internal/config"
 	"errors"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -40,6 +41,7 @@ func CreateSchema(s *sqlx.DB) error {
 	_, err := s.Exec(schema)
 
 	if err != nil {
+		fmt.Println("Error en creación del esquema")
 		return err
 	}
 
